@@ -13,7 +13,37 @@ namespace StonePlusCalc.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            var model = new CostModel
+            {
+                check = false
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Index(CostModel model)
+        {
+            Stone a = db.Stones.FirstOrDefault(t => t.Code == model.Code);
+
+            double totalCost = (model.FPPT * model.Tons) + (model.MPPT * model.Tons);
+            double costPerYard = totalCost / ((model.FPPT + model.MPPT) * 1.325);
+            double prelimCost = totalCost / costPerYard;
+            double vendorI = (model.MPPT * model.Tons) / prelimCost;
+            double vendorC = (model.MPPT * model.Tons) / vendorI;
+            double freightI = (model.FPPT * model.Tons) / prelimCost;
+            double freightC = (model.FPPT * model.Tons) / freightI;
+
+            var modell = new CostModel
+            {
+                VI = vendorI,
+                VC = vendorC,
+                FI = freightI,
+                FC = freightC,
+                check = true
+            };
+
+            return View(modell);
         }
 
         public ActionResult About()
